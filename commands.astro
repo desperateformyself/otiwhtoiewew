@@ -1,0 +1,135 @@
+---
+import Base from '../layouts/lilybaseweb.astro';
+
+const commands = [
+  { name: '/warn',   perm: 'Moderate Members', desc: 'Issue a warning to a member. Auto-bans at the configured threshold.' },
+  { name: '/mute',   perm: 'Moderate Members', desc: 'Timeout a member for a chosen duration (60 seconds up to 1 week).' },
+  { name: '/kick',   perm: 'Kick Members',     desc: 'Kick a member from the server with an optional reason.' },
+  { name: '/ban',    perm: 'Ban Members',      desc: 'Permanently ban a member, with optional message deletion (0–7 days).' },
+  { name: '/av',     perm: 'Check user avatar', desc: 'Display a high-quality, full-size version of a user profile avatar.'},
+  { name: '/banner', perm: 'Check user banner', desc: 'Fetch and display a user custom profile banner image if they have one configured.'}
+];
+
+---
+<Base title="Commands — Lily">
+  <style>
+    .page-hero {
+      background: linear-gradient(180deg, var(--blush) 0%, var(--white) 100%);
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-hero h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-hero p {
+      color: var(--muted);
+      font-weight: 300;
+      font-size: 0.975rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .page-body {
+      max-width: 780px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .cmd-row {
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      align-items: center;
+      gap: 1.25rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .cmd-row:hover {
+      box-shadow: 0 4px 20px #f9a8d420;
+      transform: translateY(-1px);
+    }
+
+    .cmd-name {
+      font-family: 'DM Mono', 'Fira Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--pink-mid);
+      background: var(--blush2);
+      border: 1px solid var(--pink-light);
+      padding: 0.3rem 0.7rem;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .cmd-desc {
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .cmd-perm {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--blush);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .note {
+      margin-top: 2rem;
+      padding: 1.25rem 1.5rem;
+      background: var(--blush);
+      border: 1px solid var(--pink-light);
+      border-radius: 16px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .note strong { color: var(--pink-mid); font-weight: 600; }
+
+    @media (max-width: 560px) {
+      .cmd-row { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="page-hero">
+    <h1>Commands</h1>
+    <p>All of Lily's slash commands, their required permissions, and what they do.</p>
+  </div>
+
+  <div class="page-body">
+    <div class="cmd-list">
+      {commands.map(c => (
+        <div class="cmd-row">
+          <span class="cmd-name">{c.name}</span>
+          <span class="cmd-desc">{c.desc}</span>
+          <span class="cmd-perm">{c.perm}</span>
+        </div>
+      ))}
+    </div>
+
+    <p class="note">
+      <strong>Note:</strong> Lily's role must be placed <em>above</em> the target member in your server's role hierarchy for these commands to work. You can drag roles in Server Settings → Roles.
+    </p>
+  </div>
+</Base>
