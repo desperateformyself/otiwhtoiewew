@@ -1,0 +1,2282 @@
+---
+import Base from "../layouts/lilybaseweb.astro";
+
+const features = [
+  {
+    emoji: "🛡️",
+    title: "Auto-moderation",
+    desc: "Spam detection, bad word filtering, and raid protection — quietly running in the background.",
+  },
+  {
+    emoji: "⚠️",
+    title: "Warning system",
+    desc: "Track strikes per user with configurable auto-escalation to kicks or bans.",
+  },
+  {
+    emoji: "📋",
+    title: "Audit logging",
+    desc: "Every mod action is logged to a channel and stored so nothing slips through.",
+  },
+  {
+    emoji: "⚡",
+    title: "Slash commands",
+    desc: "Clean and fast with permission checks built in.",
+  },
+  {
+    emoji: "⚙️",
+    title: "Per-server config",
+    desc: "Set your log channel, warn threshold, and bad word list individually per server.",
+  },
+  {
+    emoji: "🌸",
+    title: "Always online",
+    desc: "Automatic restarts and zero downtime deploys.",
+  },
+];
+---
+
+<Base title="Lily — Discord Moderation">
+  <style>
+    /* ── Hero ──────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      background: linear-gradient(180deg, var(--blush) 0%, var(--white) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #sakura-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-container {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          ellipse 60% 40% at 20% 30%,
+          var(--hero-gradient-1) 0%,
+          transparent 70%
+        ),
+        radial-gradient(
+          ellipse 40% 30% at 80% 60%,
+          var(--hero-gradient-2) 0%,
+          transparent 70%
+        );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--pink-mid);
+      background: var(--blush2);
+      border: 1px solid var(--pink-light);
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero h1 {
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-size: clamp(3.5rem, 9vw, 6.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--pink-mid);
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .cta {
+      display: inline-flex;
+      gap: 0.875rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--pink-mid);
+      color: #fff;
+      box-shadow: 0 4px 20px #ec489940;
+    }
+
+    .btn-primary:hover {
+      background: var(--pink-deep);
+      box-shadow: 0 6px 24px #be185d50;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: var(--white);
+      color: var(--pink-mid);
+      border: 1.5px solid var(--pink-light);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--pink-mid);
+      color: var(--pink-deep);
+      transform: translateY(-1px);
+    }
+
+    /* ── Features ──────────────────────────────────────────────────────── */
+    .features-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--pink-mid);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3rem;
+      letter-spacing: -0.02em;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      transition:
+        box-shadow 0.2s,
+        transform 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 32px var(--card-glow);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--blush2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ── Interactive Sandbox & Logs ────────────────────────────────────── */
+    .sandbox-section {
+      padding: 5rem 2rem;
+      background: var(--blush);
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sandbox-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      max-width: 960px;
+      margin: 0 auto 3rem;
+    }
+
+    @media (max-width: 800px) {
+      .sandbox-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .config-panel {
+      background: var(--white);
+      border: 1.5px solid var(--pink-light);
+      border-radius: 24px;
+      padding: 2.25rem;
+      box-shadow: 0 12px 36px var(--card-glow);
+    }
+
+    .config-panel h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .config-group {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .config-group:last-of-type {
+      border-bottom: none;
+    }
+
+    .config-desc {
+      font-size: 0.885rem;
+      color: var(--text);
+      opacity: 0.8;
+      margin-top: 0.45rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Bad word tag configurator styles */
+    .tag-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .tags-input {
+      width: 100%;
+      padding: 0.65rem 0.95rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--pink-light);
+      background: var(--white);
+      color: var(--text);
+      outline: none;
+      font-size: 0.885rem;
+      transition: all 0.2s;
+    }
+
+    .tags-input:focus {
+      border-color: var(--pink-mid);
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+    }
+
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .tag-pill {
+      background: var(--blush2);
+      color: var(--pink-deep);
+      border: 1.5px solid var(--pink-light);
+      font-size: 0.8rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .tag-pill:hover {
+      background: var(--pink-light);
+      color: var(--pink-deep);
+      text-decoration: line-through;
+    }
+
+    /* Toggle switches */
+    .toggle-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      width: 100%;
+      user-select: none;
+    }
+
+    .toggle-switch input {
+      display: none;
+    }
+
+    .slider {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      background-color: var(--pink-light);
+      border-radius: 999px;
+      transition: background-color 0.2s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-switch input:checked + .slider {
+      background-color: var(--pink-mid);
+    }
+
+    .toggle-switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    .label-text {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    /* Range slider */
+    .range-slider {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .range-slider input {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--pink-light);
+      outline: none;
+    }
+
+    .range-slider input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--pink-mid);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      transition: transform 0.1s;
+    }
+
+    .range-slider input::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .sim-btn {
+      width: 100%;
+      margin-top: 1rem;
+      text-align: center;
+      box-sizing: border-box;
+      border: 1.5px solid var(--pink-mid);
+      color: var(--pink-mid);
+      background: transparent;
+      padding: 0.75rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sim-btn:hover {
+      background: var(--pink-mid);
+      color: #fff;
+    }
+
+    /* Discord mockup styling */
+    .discord-mockup {
+      background: #313338;
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      height: 400px;
+    }
+
+    .discord-header {
+      background: #2b2d31;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .discord-channel-hash {
+      color: #80848e;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .discord-channel-name {
+      color: #f2f3f5;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .discord-header-desc {
+      color: #949ba4;
+      font-size: 0.8rem;
+    }
+
+    .discord-chat-area {
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .discord-msg {
+      display: flex;
+      gap: 1rem;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .discord-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-size: cover;
+      flex-shrink: 0;
+    }
+
+    .avatar-lily {
+      background-color: var(--pink-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .avatar-user {
+      background-color: #5865f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .discord-msg-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .discord-user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .discord-username {
+      color: #f2f3f5;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .discord-bot-badge {
+      background: #5865f2;
+      color: #ffffff;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.25rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .discord-time {
+      color: #949ba4;
+      font-size: 0.7rem;
+    }
+
+    .discord-text {
+      color: #dbdee1;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .discord-text code {
+      background: #1e1f22;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    .system-msg {
+      background: rgba(88, 101, 242, 0.1);
+      border-left: 3px solid #5865f2;
+      padding: 0.5rem 1rem;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .system-text {
+      color: #949ba4;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    .deleted-text {
+      color: #f23f43;
+      font-style: italic;
+      font-size: 0.85rem;
+      text-decoration: line-through;
+    }
+
+    .discord-embed {
+      background: #2b2d31;
+      border-left: 4px solid var(--pink-mid);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.4rem;
+      max-width: 400px;
+    }
+
+    .discord-embed-title {
+      color: #f2f3f5;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .discord-embed-desc {
+      color: #dbdee1;
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+
+    /* Console / terminal panel */
+    .terminal-container {
+      background: #0f070e;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .terminal-header {
+      background: #1a0c16;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .red {
+      background-color: #ff5f56;
+    }
+    .yellow {
+      background-color: #ffbd2e;
+    }
+    .green {
+      background-color: #27c93f;
+    }
+
+    .terminal-title {
+      color: #9d6b85;
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-left: 0.75rem;
+    }
+
+    .terminal-body {
+      padding: 1.5rem;
+      height: 220px;
+      overflow-y: auto;
+      font-family: "DM Mono", monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #fce7f3;
+      background: #0d040a;
+    }
+
+    .log-line {
+      margin-bottom: 0.4rem;
+      animation: fadeIn 0.2s ease-out forwards;
+      border-left: 2px solid transparent;
+      padding-left: 0.5rem;
+      color: #fce7f3;
+    }
+
+    .log-line.log-info {
+      border-left-color: #3498db;
+    }
+    .log-line.log-warn {
+      border-left-color: #f1c40f;
+    }
+    .log-line.log-error {
+      border-left-color: #e74c3c;
+    }
+    .log-line.log-success {
+      border-left-color: #2ecc71;
+    }
+
+    .log-time {
+      color: #cca3b9;
+      margin-right: 0.5rem;
+    }
+    .log-msg {
+      color: #fdf2f8;
+    }
+    .log-tag {
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+    .log-tag.info {
+      color: #3498db;
+    }
+    .log-tag.warn {
+      color: #f1c40f;
+    }
+    .log-tag.error {
+      color: #e74c3c;
+    }
+    .log-tag.success {
+      color: #2ecc71;
+    }
+
+    /* ── Discord Welcome Embed Creator ─────────────────────────────────── */
+    .embed-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+      position: relative;
+      z-index: 2;
+    }
+
+    .embed-container {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 2.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 800px) {
+      .embed-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .embed-controls {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px var(--card-glow);
+    }
+
+    .embed-controls h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .control-field {
+      margin-bottom: 1.25rem;
+    }
+
+    .control-field label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .control-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .control-input:focus {
+      border-color: var(--pink-mid);
+    }
+
+    .control-textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
+    }
+
+    .color-picker-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .color-picker-input {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
+    }
+
+    .color-picker-input::-webkit-color-swatch {
+      border: 1px solid var(--border);
+      border-radius: 50%;
+    }
+
+    .embed-preview-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .discord-embed-msg {
+      background: #313338;
+      border-radius: 24px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      padding: 1.5rem;
+    }
+
+    /* ── FAQ Accordion Section ─────────────────────────────────────────── */
+    .faq-section {
+      padding: 5rem 2rem;
+      background: var(--blush);
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-list {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .faq-item {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition:
+        box-shadow 0.2s,
+        border-color 0.2s;
+    }
+
+    .faq-item:hover {
+      box-shadow: 0 4px 12px var(--card-glow);
+    }
+
+    .faq-item.active {
+      border-color: var(--pink-light);
+      box-shadow: 0 8px 24px var(--card-glow);
+    }
+
+    .faq-question {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .faq-icon {
+      font-size: 1.2rem;
+      color: var(--muted);
+      transition:
+        transform 0.3s ease,
+        color 0.3s ease;
+      line-height: 1;
+      display: inline-block;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition:
+        max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.3s ease;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 0 1.5rem;
+      font-weight: 300;
+    }
+
+    .faq-item.active .faq-answer {
+      padding-top: 0.5rem;
+      padding-bottom: 1.25rem;
+      max-height: 200px;
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+      color: var(--pink-mid);
+    }
+
+    /* ── CTA banner ────────────────────────────────────────────────────── */
+    .banner {
+      margin: 0 2rem 2rem;
+      background: var(--banner-bg);
+      border: 1px solid var(--pink-light);
+      border-radius: 24px;
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      transition:
+        background 0.3s ease,
+        border-color 0.3s ease;
+    }
+
+    .banner h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .banner p {
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    /* ── Interactive Quote Card Generator ─────────────────────────────── */
+    .quote-gen-section {
+      padding: 5rem 2rem;
+      background: var(--blush);
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid var(--border);
+    }
+
+    .quote-gen-container {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 2.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 800px) {
+      .quote-gen-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .quote-gen-controls {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px var(--card-glow);
+    }
+
+    .quote-gen-controls h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    /* Preset Avatars styling */
+    .avatar-presets {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preset-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      background-size: cover;
+      transition: all 0.2s;
+    }
+
+    .preset-avatar:hover, .preset-avatar.active {
+      border-color: var(--pink-mid);
+      transform: scale(1.05);
+    }
+
+    .preset-lily {
+      background-color: var(--pink-light);
+    }
+
+    .preset-discord-blue {
+      background-color: #5865f2;
+      color: white;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+
+    .preset-discord-green {
+      background-color: #248046;
+      color: white;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+
+    /* Custom File Input trigger */
+    .custom-avatar-upload {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .upload-btn {
+      border: 1.5px dashed var(--pink-light);
+      background: transparent;
+      color: var(--pink-mid);
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: all 0.2s;
+    }
+
+    .upload-btn:hover {
+      background: var(--blush2);
+      border-color: var(--pink-mid);
+    }
+
+    .upload-btn input[type=file] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .canvas-preview-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .canvas-holder {
+      background: #0f1012;
+      border-radius: 20px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .quote-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .download-btn {
+      width: 100%;
+      max-width: 500px;
+      background: linear-gradient(135deg, var(--pink-mid) 0%, #f472b6 100%);
+      color: #fff;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px #ec489940;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .download-btn:hover {
+      box-shadow: 0 6px 24px #be185d50;
+      transform: translateY(-1px);
+    }
+  </style>
+
+  <section class="hero">
+    <canvas id="sakura-canvas"></canvas>
+    <div class="hero-container">
+      <div class="hero-eyebrow">Discord moderation bot</div>
+      <h1>Meet <em>Lily</em></h1>
+      <p>
+        Gentle on your server, firm on bad actors. Lily handles moderation
+        automatically so you don't have to.
+      </p>
+      <div class="cta">
+        <a
+          class="btn btn-primary"
+          href="https://discord.com/oauth2/authorize?client_id=1516374380710727750&permissions=8&integration_type=0&scope=applications.commands+bot"
+          target="_blank">Add Lily to Discord</a
+        >
+        <a class="btn btn-ghost" href="/commands">View commands</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <p class="section-label">Everything you need</p>
+    <h2 class="section-title">Built for busy server owners</h2>
+    <div class="features-grid">
+      {
+        features.map((f) => (
+          <div class="card">
+            <div class="card-icon">{f.emoji}</div>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Sandbox Dashboard & Live Logs -->
+  <section class="sandbox-section">
+    <p class="section-label">Interactive Sandbox</p>
+    <h2 class="section-title">Try Lily Live</h2>
+
+    <div class="sandbox-container">
+      <!-- Left Config Controls -->
+      <div class="config-panel">
+        <h3>⚙️ Configuration Sandbox</h3>
+
+        <div class="config-group">
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-automod" checked />
+            <span class="slider"></span>
+            <span class="label-text">Anti-Spam Filter</span>
+          </label>
+          <p class="config-desc">
+            Automatically blocks and purges server invites and spam links.
+          </p>
+        </div>
+
+        <div class="config-group">
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-badwords" checked />
+            <span class="slider"></span>
+            <span class="label-text">Profanity Filter</span>
+          </label>
+          <p class="config-desc">
+            Deletes messages containing prohibited words.
+          </p>
+
+          <!-- Bad Word Tags input -->
+          <div class="tag-input-wrapper">
+            <input
+              type="text"
+              id="badwords-input"
+              class="tags-input"
+              placeholder="Type custom word & press Enter"
+            />
+            <div id="badwords-tags" class="tags-container"></div>
+          </div>
+        </div>
+
+        <div class="config-group">
+          <label class="range-slider">
+            <span class="label-text"
+              >Warning Limit: <span id="warn-val">3</span></span
+            >
+            <input type="range" id="slider-warn" min="2" max="5" value="3" />
+          </label>
+          <p class="config-desc">
+            Configures how many warning strikes trigger an auto-kick/ban.
+          </p>
+        </div>
+
+        <button id="trigger-test-btn" class="sim-btn"
+          >Simulate Channel Violations</button
+        >
+      </div>
+
+      <!-- Right Discord Chat Simulation -->
+      <div class="discord-mockup">
+        <div class="discord-header">
+          <span class="discord-channel-hash">#</span>
+          <span class="discord-channel-name">chat-moderation</span>
+          <span class="discord-header-desc"
+            >| Test automod actions in real time</span
+          >
+        </div>
+        <div class="discord-chat-area" id="discord-messages">
+          <div class="discord-msg system-msg">
+            <div class="discord-msg-content">
+              <span class="system-text"
+                >🤖 Lily has entered the room. Tweak the options on the left and
+                click "Simulate Channel Violations" to see her in action!</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Scroll Log Feed -->
+    <div class="terminal-container">
+      <div class="terminal-header">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">lily-bot-audit-logs.log — Live Feed</span>
+      </div>
+      <div class="terminal-body" id="live-audit-logs">
+        <!-- Javascript fills logs -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Discord Welcome Embed Creator Section -->
+  <section class="embed-section">
+    <p class="section-label">Visual Tools</p>
+    <h2 class="section-title">Try creating your embed</h2>
+
+    <div class="embed-container">
+      <!-- Left Controls -->
+      <div class="embed-controls">
+        <h3>🎨 Embed Configurator</h3>
+
+        <div class="control-field">
+          <label for="embed-title-input">Embed Title</label>
+          <input
+            type="text"
+            id="embed-title-input"
+            class="control-input"
+            value="🌸 Welcome to Sakura Garden!"
+            placeholder="Enter title"
+          />
+        </div>
+
+        <div class="control-field">
+          <label for="embed-desc-input">Embed Description</label>
+          <textarea
+            id="embed-desc-input"
+            class="control-input control-textarea"
+            placeholder="Enter description"
+            >Be sure to read #rules-and-info and respect others! Have a
+            wonderful time here. 💖</textarea
+          >
+        </div>
+
+        <div class="control-field">
+          <label>Left Accent Color</label>
+          <div class="color-picker-group">
+            <input
+              type="color"
+              id="embed-color-input"
+              class="color-picker-input"
+              value="#ec4899"
+            />
+            <span
+              id="embed-color-hex"
+              style="font-family: monospace; font-size: 0.9rem; color: var(--muted);"
+              >#ec4899</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Preview -->
+      <div class="embed-preview-wrapper">
+        <div class="discord-embed-msg">
+          <div class="discord-msg lily-msg">
+            <div class="discord-avatar avatar-lily">🌸</div>
+            <div class="discord-msg-content" style="width: 100%;">
+              <div class="discord-user-info">
+                <span class="discord-username">Lily</span>
+                <span class="discord-bot-badge">Bot</span>
+                <span class="discord-time">Today at 12:00 PM</span>
+              </div>
+
+              <!-- Discord Embed card -->
+              <div
+                class="discord-embed"
+                id="preview-embed-card"
+                style="max-width: 100%; border-left: 4px solid #ec4899; width: 100%;"
+              >
+                <div class="discord-embed-title" id="preview-embed-title">
+                  🌸 Welcome to Sakura Garden!
+                </div>
+                <div
+                  class="discord-embed-desc"
+                  id="preview-embed-desc"
+                  style="white-space: pre-line;"
+                >
+                  Be sure to read #rules-and-info and respect others! Have a
+                  wonderful time here. 💖
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Quote Card Generator Section -->
+  <section class="quote-gen-section">
+    <p class="section-label">Create Your Own Quote</p>
+    <h2 class="section-title">Lily Quote Generator</h2>
+
+    <div class="quote-gen-container">
+      <!-- Left Config Controls -->
+      <div class="quote-gen-controls">
+        <h3>🎨 Card Customizer</h3>
+
+        <div class="control-field">
+          <label for="quote-text-input">Quote Text</label>
+          <textarea
+            id="quote-text-input"
+            class="control-input control-textarea"
+            placeholder="Type quote message here..."
+          >You miss 100% of the shots you don't take. — Wayne Gretzky</textarea>
+        </div>
+
+        <div class="control-field">
+          <label for="quote-username-input">Author Username</label>
+          <input
+            type="text"
+            id="quote-username-input"
+            class="control-input"
+            value="Michael Scott"
+            placeholder="Username"
+          />
+        </div>
+
+        <div class="control-field">
+          <label for="quote-userid-input">Author User ID</label>
+          <input
+            type="text"
+            id="quote-userid-input"
+            class="control-input"
+            value="1516374380710727750"
+            placeholder="Discord User ID"
+          />
+        </div>
+
+        <div class="control-field">
+          <label>Author Avatar</label>
+          <div class="avatar-presets">
+            <button class="preset-avatar preset-lily active" data-preset="lily" title="Lily Default">🌸</button>
+            <button class="preset-avatar preset-discord-blue" data-preset="blue" title="Discord Blue">D</button>
+            <button class="preset-avatar preset-discord-green" data-preset="green" title="Discord Green">D</button>
+            <div class="custom-avatar-upload">
+              <div class="upload-btn">
+                📤 Upload Image
+                <input type="file" id="quote-avatar-upload" accept="image/*" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-field">
+          <label>Gradient Accent Color</label>
+          <div class="color-picker-group">
+            <input
+              type="color"
+              id="quote-color-input"
+              class="color-picker-input"
+              value="#ff9ecf"
+            />
+            <span
+              id="quote-color-hex"
+              style="font-family: monospace; font-size: 0.9rem; color: var(--muted);"
+              >#FF9ECF</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Preview Canvas & Download Action -->
+      <div class="canvas-preview-wrapper">
+        <div class="canvas-holder">
+          <canvas id="quote-card-canvas" class="quote-canvas" width="1000" height="350"></canvas>
+        </div>
+        <button id="download-quote-btn" class="download-btn">
+          📥 Download Quote Image
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Accordion Block -->
+  <section class="faq-section">
+    <p class="section-label">Common Questions</p>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Does Lily require Administrator permissions?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            Yes, lily does require Administrator permissions. You can custom
+            configure her role with specific permissions like <strong
+              >Manage Messages</strong
+            >, <strong>Kick Members</strong>, <strong>Ban Members</strong>, and <strong
+              >Moderate Members</strong
+            > to maintain high server safety with low privilege levels.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Does the bot store my server message data?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            Absolutely not. Lily parses message content temporarily in system
+            memory to perform bad word checks and link scanning, instantly
+            disposing of it. Message details are never stored unless a rule
+            violation occurs, which writes it strictly to your log channel and
+            local warning database.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do warning limits work?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            When warning thresholds are configured (default is 3), users who
+            trigger automated filters or manual moderation logs receive warning
+            strikes. Once a member's strikes meet the threshold, Lily
+            automatically elevates the action (auto-banning them) to prevent
+            raid progression.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Does Lily support prefix commands?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>
+            Yes! Lily supports both slash commands (recommended for modern UI)
+            and classic prefix commands using the comma prefix (e.g., <code
+              >,warnings @user</code
+            > or <code>,timeout @user 10</code>) so your staff has multiple
+            quick routes for moderation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="banner">
+    <h2>Ready to add Lily?</h2>
+    <p>One click and she's in your server, protecting it around the clock.</p>
+    <a
+      class="btn btn-primary"
+      href="https://discord.com/oauth2/authorize?client_id=1516374380710727750&permissions=8&integration_type=0&scope=applications.commands+bot"
+      target="_blank">Invite Lily</a
+    >
+  </div>
+
+  <!-- Interactive Scripts -->
+  <script is:inline>
+    // ── 1. Sakura Falling Petals canvas ──────────────────────────────────────
+    const canvas = document.getElementById("sakura-canvas");
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      let petals = [];
+      let width = 0;
+      let height = 0;
+      let mouse = { x: -1000, y: -1000 };
+
+      const resize = () => {
+        width = canvas.offsetWidth;
+        height = canvas.offsetHeight;
+        canvas.width = width * window.devicePixelRatio;
+        canvas.height = height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      };
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      class Petal {
+        constructor() {
+          this.reset();
+          this.y = Math.random() * height;
+        }
+
+        reset() {
+          this.x = Math.random() * width;
+          this.y = -10;
+          this.size = Math.random() * 6 + 4;
+          this.speedX = Math.random() * 1.5 - 0.5 + 0.3; // blow slightly right
+          this.speedY = Math.random() * 0.8 + 0.6;
+          this.angle = Math.random() * Math.PI * 2;
+          this.spinSpeed = Math.random() * 0.02 - 0.01;
+          this.sway = Math.random() * Math.PI;
+          this.swaySpeed = Math.random() * 0.02 + 0.005;
+        }
+
+        update() {
+          this.sway += this.swaySpeed;
+          this.x += this.speedX + Math.sin(this.sway) * 0.25;
+          this.y += this.speedY;
+          this.angle += this.spinSpeed;
+
+          // React to cursor
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 80) {
+            const push = (80 - dist) * 0.08;
+            this.x -= (dx / dist) * push;
+            this.y -= (dy / dist) * push;
+          }
+
+          if (this.y > height + 10 || this.x < -10 || this.x > width + 10) {
+            this.reset();
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.angle);
+          ctx.beginPath();
+          // Sakura blossom shape: two overlapping ellipses
+          ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(236, 72, 153, 0.45)"; // Soft translucent pink
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // Initialize
+      for (let i = 0; i < 35; i++) {
+        petals.push(new Petal());
+      }
+
+      window.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+
+      window.addEventListener("mouseleave", () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+      });
+
+      const tick = () => {
+        ctx.clearRect(0, 0, width, height);
+        petals.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(tick);
+      };
+      tick();
+    }
+
+    // ── 2. Interactive Sandbox / Discord simulation ────────────────────────
+    const warnSlider = document.getElementById("slider-warn");
+    const warnVal = document.getElementById("warn-val");
+    const automodToggle = document.getElementById("toggle-automod");
+    const badwordsToggle = document.getElementById("toggle-badwords");
+    const simButton = document.getElementById("trigger-test-btn");
+    const discordChat = document.getElementById("discord-messages");
+    const auditLogs = document.getElementById("live-audit-logs");
+
+    if (warnSlider && warnVal) {
+      warnSlider.addEventListener("input", (e) => {
+        warnVal.textContent = e.target.value;
+      });
+    }
+
+    const formatMessage = (text) => {
+      return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    };
+
+    // Discord message generator
+    const addDiscordMessage = (
+      author,
+      content,
+      isBot = false,
+      isDeleted = false,
+      embed = null,
+    ) => {
+      const msg = document.createElement("div");
+      msg.className = `discord-msg ${isBot ? "lily-msg" : ""}`;
+
+      const avatarClass = isBot ? "avatar-lily" : "avatar-user";
+      const avatarText = isBot ? "🌸" : author[0].toUpperCase();
+      const botBadge = isBot
+        ? `<span class="discord-bot-badge">Bot</span>`
+        : "";
+      const timeStr = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+
+      let contentHtml = isDeleted
+        ? `<span class="deleted-text">Message deleted by auto-mod (strike issued)</span>`
+        : `<span class="discord-text">${formatMessage(content)}</span>`;
+
+      let embedHtml = "";
+      if (embed) {
+        embedHtml = `
+          <div class="discord-embed" style="max-width: 100%; width: 100%;">
+            <div class="discord-embed-title">${embed.title}</div>
+            <div class="discord-embed-desc">${embed.desc}</div>
+          </div>
+        `;
+      }
+
+      msg.innerHTML = `
+        <div class="discord-avatar ${avatarClass}">${avatarText}</div>
+        <div class="discord-msg-content" style="width: 100%;">
+          <div class="discord-user-info">
+            <span class="discord-username">${author}</span>
+            ${botBadge}
+            <span class="discord-time">Today at ${timeStr}</span>
+          </div>
+          ${contentHtml}
+          ${embedHtml}
+        </div>
+      `;
+
+      discordChat.appendChild(msg);
+      discordChat.scrollTop = discordChat.scrollHeight;
+    };
+
+    // Audit logs terminal writer
+    const addAuditLog = (type, action, message) => {
+      const line = document.createElement("div");
+      line.className = `log-line log-${type}`;
+
+      const timeStr = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+      const tagClass = type;
+
+      line.innerHTML = `
+        <span class="log-time">[${timeStr}]</span>
+        <span class="log-tag ${tagClass}">${action.toUpperCase()}</span>
+        <span class="log-msg">${message}</span>
+      `;
+
+      auditLogs.appendChild(line);
+      auditLogs.scrollTop = auditLogs.scrollHeight;
+
+      // Restrict lines in logs
+      while (auditLogs.childNodes.length > 20) {
+        auditLogs.removeChild(auditLogs.firstChild);
+      }
+    };
+
+    // User warning strikes memory
+    let userStrikes = 0;
+    const testUsers = [
+      "TrollFace",
+      "SpamKing",
+      "ToxicGamer",
+      "JohnDoe",
+      "EmilyS",
+    ];
+    let customBadWords = ["ugly", "ez trash", "noobs"];
+    const testSpam = [
+      "FREE DISCORD NITRO!! JOIN HERE: discord.gg/scam-link",
+      "GET FREE CRYPTO RIGHT NOW! https://bit.ly/scam-tokens",
+    ];
+
+    // Bad words tag system
+    const tagsContainer = document.getElementById("badwords-tags");
+    const badwordsInput = document.getElementById("badwords-input");
+
+    const renderTags = () => {
+      tagsContainer.innerHTML = "";
+      customBadWords.forEach((word) => {
+        const pill = document.createElement("span");
+        pill.className = "tag-pill";
+        pill.innerHTML = `${word} &times;`;
+        pill.addEventListener("click", () => {
+          customBadWords = customBadWords.filter((w) => w !== word);
+          renderTags();
+          addAuditLog("info", "config", `Removed custom word: "${word}"`);
+        });
+        tagsContainer.appendChild(pill);
+      });
+    };
+    renderTags();
+
+    if (badwordsInput) {
+      badwordsInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const val = badwordsInput.value.trim().toLowerCase();
+          if (val && !customBadWords.includes(val)) {
+            customBadWords.push(val);
+            renderTags();
+            addAuditLog("success", "config", `Added custom word: "${val}"`);
+            badwordsInput.value = "";
+          }
+        }
+      });
+    }
+
+    if (simButton) {
+      simButton.addEventListener("click", () => {
+        const user = testUsers[Math.floor(Math.random() * testUsers.length)];
+        const isSpam = Math.random() > 0.5;
+
+        let rawMessage = "";
+        if (isSpam) {
+          rawMessage = testSpam[Math.floor(Math.random() * testSpam.length)];
+        } else {
+          const word =
+            customBadWords.length > 0
+              ? customBadWords[
+                  Math.floor(Math.random() * customBadWords.length)
+                ]
+              : "friendly";
+          rawMessage = `You all are so **${word}**!`;
+        }
+
+        // 1. User sends message
+        addDiscordMessage(user, rawMessage);
+
+        // 2. Lily processes message based on sandbox config
+        setTimeout(() => {
+          const automodOn = automodToggle.checked;
+          const badwordsOn = badwordsToggle.checked;
+          const threshold = parseInt(warnSlider.value);
+
+          if (isSpam && automodOn) {
+            // Delete spam
+            addAuditLog(
+              "warn",
+              "automod",
+              `Filtered spam link from user ${user}`,
+            );
+
+            // Delete message in mockup
+            const lastMsg = discordChat.lastElementChild;
+            const textSpan = lastMsg.querySelector(".discord-text");
+            if (textSpan) {
+              textSpan.className = "deleted-text";
+              textSpan.textContent =
+                "Message deleted by auto-mod (Anti-Spam Shield)";
+            }
+
+            userStrikes++;
+            addAuditLog(
+              "info",
+              "strike",
+              `${user} strike updated: ${userStrikes}/${threshold}`,
+            );
+
+            if (userStrikes >= threshold) {
+              addDiscordMessage(
+                "Lily",
+                `⛔ **${user}** has been banned. Reason: Exceeded warning limit (${threshold}/${threshold})`,
+                true,
+              );
+              addAuditLog(
+                "error",
+                "ban",
+                `Auto-banned user ${user} (Exceeded limit: ${threshold}/${threshold})`,
+              );
+              userStrikes = 0; // reset
+            } else {
+              addDiscordMessage(
+                "Lily",
+                `⚠️ **${user}** has been warned for posting links. Warning count: **${userStrikes}/${threshold}**`,
+                true,
+              );
+            }
+          } else if (
+            !isSpam &&
+            badwordsOn &&
+            customBadWords.some((w) => rawMessage.toLowerCase().includes(w))
+          ) {
+            // Delete bad word
+            addAuditLog(
+              "warn",
+              "automod",
+              `Profanity filtered from user ${user}`,
+            );
+
+            const lastMsg = discordChat.lastElementChild;
+            const textSpan = lastMsg.querySelector(".discord-text");
+            if (textSpan) {
+              textSpan.className = "deleted-text";
+              textSpan.textContent =
+                "Message deleted by auto-mod (Profanity Filter)";
+            }
+
+            userStrikes++;
+            addAuditLog(
+              "info",
+              "strike",
+              `${user} strike updated: ${userStrikes}/${threshold}`,
+            );
+
+            if (userStrikes >= threshold) {
+              addDiscordMessage(
+                "Lily",
+                `⛔ **${user}** has been banned. Reason: Exceeded warning limit (${threshold}/${threshold})`,
+                true,
+              );
+              addAuditLog(
+                "error",
+                "ban",
+                `Auto-banned user ${user} (Exceeded limit: ${threshold}/${threshold})`,
+              );
+              userStrikes = 0; // reset
+            } else {
+              addDiscordMessage(
+                "Lily",
+                `⚠️ **${user}** has been warned for using bad words. Warning count: **${userStrikes}/${threshold}**`,
+                true,
+              );
+            }
+          } else {
+            // No action taken
+            addAuditLog("success", "message", `Message approved from ${user}`);
+          }
+        }, 600);
+      });
+    }
+
+    // Auto-running simulated background logs
+    const mockFeedEvents = [
+      {
+        type: "info",
+        act: "sys",
+        msg: "Checking connection to Discord Gateway...",
+      },
+      {
+        type: "success",
+        act: "sys",
+        msg: "Lily successfully logged in as: Lily#8024",
+      },
+      {
+        type: "info",
+        act: "guild",
+        msg: 'Synced command cache for server: "Sakura Garden"',
+      },
+      {
+        type: "success",
+        act: "automod",
+        msg: "Spam filters loaded successfully (34 rules active)",
+      },
+    ];
+
+    mockFeedEvents.forEach((evt, idx) => {
+      setTimeout(() => {
+        addAuditLog(evt.type, evt.act, evt.msg);
+      }, idx * 1000);
+    });
+
+    const loopLogs = () => {
+      const actions = [
+        {
+          type: "info",
+          act: "command",
+          msg: 'Slash command "/warnings" executed by Mod#1234',
+        },
+        {
+          type: "warn",
+          act: "automod",
+          msg: 'Invite link filter triggered in server "Dojo Devs"',
+        },
+        {
+          type: "success",
+          act: "unmute",
+          msg: "User ToxicGuy#0011 unmute timer completed successfully",
+        },
+        {
+          type: "info",
+          act: "warn",
+          msg: "Strike #1 issued to Troll#9234 by Admin (Reason: Off-topic spam)",
+        },
+      ];
+
+      const randomAct = actions[Math.floor(Math.random() * actions.length)];
+      addAuditLog(randomAct.type, randomAct.act, randomAct.msg);
+
+      setTimeout(loopLogs, 7000 + Math.random() * 5000);
+    };
+
+    setTimeout(loopLogs, 5000);
+
+    // ── 3. Discord Welcome Embed Creator ─────────────────────────────────────
+    const embedTitleInput = document.getElementById("embed-title-input");
+    const embedDescInput = document.getElementById("embed-desc-input");
+    const embedColorInput = document.getElementById("embed-color-input");
+    const embedColorHex = document.getElementById("embed-color-hex");
+
+    const previewEmbedCard = document.getElementById("preview-embed-card");
+    const previewEmbedTitle = document.getElementById("preview-embed-title");
+    const previewEmbedDesc = document.getElementById("preview-embed-desc");
+
+    const updateEmbedPreview = () => {
+      if (previewEmbedTitle && embedTitleInput) {
+        previewEmbedTitle.textContent =
+          embedTitleInput.value || "Untitled Embed";
+      }
+      if (previewEmbedDesc && embedDescInput) {
+        previewEmbedDesc.textContent = embedDescInput.value || "";
+      }
+      if (previewEmbedCard && embedColorInput) {
+        const col = embedColorInput.value;
+        previewEmbedCard.style.borderLeftColor = col;
+        if (embedColorHex) {
+          embedColorHex.textContent = col.toUpperCase();
+        }
+      }
+    };
+
+    if (embedTitleInput)
+      embedTitleInput.addEventListener("input", updateEmbedPreview);
+    if (embedDescInput)
+      embedDescInput.addEventListener("input", updateEmbedPreview);
+    if (embedColorInput)
+      embedColorInput.addEventListener("input", updateEmbedPreview);
+
+    // Initialize embed preview values on load
+    updateEmbedPreview();
+
+    // ── 4. FAQ Accordions ───────────────────────────────────────────────────
+    const faqItems = document.querySelectorAll(".faq-item");
+    faqItems.forEach((item) => {
+      const question = item.querySelector(".faq-question");
+      if (question) {
+        question.addEventListener("click", () => {
+          const isActive = item.classList.contains("active");
+
+          // Close others
+          faqItems.forEach((i) => i.classList.remove("active"));
+
+          // Toggle current
+          if (!isActive) {
+            item.classList.add("active");
+          }
+        });
+      }
+    });
+
+    // ── 5. Interactive Quote Card Generator ─────────────────────────────────
+    const quoteTextVal = document.getElementById("quote-text-input");
+    const quoteUserVal = document.getElementById("quote-username-input");
+    const quoteUserIdVal = document.getElementById("quote-userid-input");
+    const quoteColorVal = document.getElementById("quote-color-input");
+    const quoteColorHexVal = document.getElementById("quote-color-hex");
+    const quoteCanvas = document.getElementById("quote-card-canvas");
+    const downloadBtn = document.getElementById("download-quote-btn");
+    const avatarUpload = document.getElementById("quote-avatar-upload");
+    const presetBtns = document.querySelectorAll(".preset-avatar");
+
+    function generatePresetAvatar(type) {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+      if (type === 'lily') {
+        ctx.fillStyle = '#fce7f3';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.font = '130px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌸', 128, 128);
+      } else if (type === 'blue') {
+        ctx.fillStyle = '#5865f2';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 120px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('M', 128, 134);
+      } else if (type === 'green') {
+        ctx.fillStyle = '#248046';
+        ctx.fillRect(0, 0, 256, 256);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 120px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('S', 128, 134);
+      }
+      return c.toDataURL();
+    }
+
+    let currentAvatarDataUrl = generatePresetAvatar('lily');
+    let selectedPreset = 'lily';
+    let loadedAvatarImg = null;
+
+    function loadAvatar(dataUrl, callback) {
+      const img = new Image();
+      img.onload = () => {
+        loadedAvatarImg = img;
+        if (callback) callback();
+      };
+      img.src = dataUrl;
+    }
+
+    // Avatar Presets Click Handler
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        presetBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedPreset = btn.getAttribute('data-preset');
+        currentAvatarDataUrl = generatePresetAvatar(selectedPreset);
+        loadAvatar(currentAvatarDataUrl, drawQuoteCard);
+      });
+    });
+
+    // Custom Avatar File Upload Handler
+    if (avatarUpload) {
+      avatarUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            currentAvatarDataUrl = event.target.result;
+            presetBtns.forEach(b => b.classList.remove('active'));
+            selectedPreset = 'custom';
+            loadAvatar(currentAvatarDataUrl, drawQuoteCard);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Text wrapping function
+    function wrapTextClient(ctx, text, maxWidth) {
+      const words = text.split(/\s+/);
+      const lines = [];
+      let currentLine = '';
+
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const width = ctx.measureText(testLine).width;
+
+        if (width > maxWidth) {
+          if (currentLine) {
+            lines.push(currentLine);
+          }
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+      return lines;
+    }
+
+    function drawQuoteCard() {
+      if (!quoteCanvas) return;
+      const ctx = quoteCanvas.getContext('2d');
+
+      const text = quoteTextVal ? quoteTextVal.value : "You miss 100% of the shots you don't take. — Wayne Gretzky";
+      const username = quoteUserVal ? quoteUserVal.value : "Michael Scott";
+      const userId = quoteUserIdVal ? quoteUserIdVal.value : "1516374380710727750";
+      const color = quoteColorVal ? quoteColorVal.value : "#ff9ecf";
+
+      if (quoteColorHexVal) {
+        quoteColorHexVal.textContent = color.toUpperCase();
+      }
+
+      // 1. Calculate dynamic wrapping and height
+      const width = 1000;
+      const paddingX = 60;
+      const maxWidth = width - paddingX * 2;
+
+      let fontSize = 28;
+      ctx.font = `italic ${fontSize}px sans-serif`;
+      let wrappedLines = wrapTextClient(ctx, text, maxWidth);
+
+      if (wrappedLines.length > 5) {
+        fontSize = 22;
+        ctx.font = `italic ${fontSize}px sans-serif`;
+        wrappedLines = wrapTextClient(ctx, text, maxWidth);
+      }
+      if (wrappedLines.length > 8) {
+        fontSize = 18;
+        ctx.font = `italic ${fontSize}px sans-serif`;
+        wrappedLines = wrapTextClient(ctx, text, maxWidth).slice(0, 10);
+      }
+
+      const headerHeight = 170;
+      const lineSpacing = fontSize * 1.35;
+      const contentHeight = wrappedLines.length * lineSpacing;
+      const footerHeight = 40;
+      const height = Math.max(300, headerHeight + contentHeight + footerHeight);
+
+      // Set canvas size (resizes layout dynamically)
+      quoteCanvas.width = width;
+      quoteCanvas.height = height;
+
+      // Redefine font after resizing canvas since resizing resets state
+      ctx.font = `italic ${fontSize}px sans-serif`;
+
+      // 2. Draw Background Layer
+      ctx.fillStyle = '#0f1012';
+      ctx.fillRect(0, 0, width, height);
+
+      // Extract colors for the gradient
+      // Convert hex color to rgb
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+
+      const radialGlow = ctx.createRadialGradient(width - 150, 150, 10, width - 150, 150, 500);
+      radialGlow.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.22)`);
+      radialGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = radialGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      // 3. Draw Glassmorphism Card Overlay
+      const cardMargin = 20;
+      const cardWidth = width - cardMargin * 2;
+      const cardHeight = height - cardMargin * 2;
+
+      ctx.fillStyle = 'rgba(24, 25, 28, 0.65)';
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(cardMargin, cardMargin, cardWidth, cardHeight, 16);
+      } else {
+        ctx.rect(cardMargin, cardMargin, cardWidth, cardHeight);
+      }
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(cardMargin, cardMargin, cardWidth, cardHeight, 16);
+      } else {
+        ctx.rect(cardMargin, cardMargin, cardWidth, cardHeight);
+      }
+      ctx.stroke();
+
+      // 4. Draw quotation mark decorations
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+      ctx.font = '240px Georgia, serif';
+      ctx.fillText('“', 40, 240);
+      ctx.fillText('”', width - 180, height - 60);
+
+      // 5. Draw Avatar if preloaded
+      if (loadedAvatarImg) {
+        const avatarX = 50;
+        const avatarY = 50;
+        const avatarSize = 75;
+
+        // Draw Avatar with clipping circular mask
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(loadedAvatarImg, avatarX, avatarY, avatarSize, avatarSize);
+        ctx.restore();
+
+        // White border ring on avatar
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 6. Draw Username & Details
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText(username, 50 + 75 + 20, 50 + 32);
+
+      ctx.fillStyle = '#949ba4';
+      ctx.font = '16px sans-serif';
+      const formattedDate = new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+      ctx.fillText(`ID: ${userId}  •  ${formattedDate}`, 50 + 75 + 20, 50 + 58);
+
+      // 7. Draw Quote Text
+      ctx.fillStyle = '#e3e5e8';
+      ctx.font = `italic ${fontSize}px sans-serif`;
+      ctx.textBaseline = 'top';
+
+      let currentY = headerHeight - 20;
+      for (const line of wrappedLines) {
+        ctx.fillText(line, paddingX, currentY);
+        currentY += lineSpacing;
+      }
+    }
+
+    if (quoteTextVal) quoteTextVal.addEventListener('input', drawQuoteCard);
+    if (quoteUserVal) quoteUserVal.addEventListener('input', drawQuoteCard);
+    if (quoteUserIdVal) quoteUserIdVal.addEventListener('input', drawQuoteCard);
+    if (quoteColorVal) quoteColorVal.addEventListener('input', drawQuoteCard);
+
+    // Initial draw
+    loadAvatar(currentAvatarDataUrl, drawQuoteCard);
+
+    // Download Button Click Handler
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        if (!quoteCanvas) return;
+        const link = document.createElement('a');
+        link.download = `quote-${Date.now()}.png`;
+        link.href = quoteCanvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  </script>
+</Base>
