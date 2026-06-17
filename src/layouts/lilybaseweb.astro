@@ -1,0 +1,293 @@
+---
+const { title = 'Lily', description = 'A gentle but powerful Discord moderation bot' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet" />
+  
+  <!-- Critical script: Apply theme before page renders to prevent FOUC -->
+  <script is:inline>
+    const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:      #ffffff;
+      --blush:      #fdf2f8;
+      --blush2:     #fce7f3;
+      --pink-light: #fbcfe8;
+      --pink:       #f9a8d4;
+      --pink-mid:   #ec4899;
+      --pink-deep:  #be185d;
+      --text:       #1a0a12;
+      --muted:      #9d6b85;
+      --border:     #fce7f3;
+      --nav-bg:     rgba(255, 255, 255, 0.85);
+      --hero-gradient-1: rgba(252, 231, 243, 0.5);
+      --hero-gradient-2: rgba(251, 207, 232, 0.25);
+      --card-glow:  rgba(249, 168, 212, 0.125);
+      --banner-bg:  linear-gradient(135deg, var(--blush2) 0%, var(--blush) 50%, var(--blush2) 100%);
+    }
+
+    [data-theme="dark"] {
+      --white:      #0e070c;
+      --blush:      #1a0c16;
+      --blush2:     #2a1023;
+      --pink-light: #4c183d;
+      --pink:       #d946ef;
+      --pink-mid:   #ec4899;
+      --pink-deep:  #f472b6;
+      --text:       #fdf2f8;
+      --muted:      #cca3b9;
+      --border:     #2e1227;
+      --nav-bg:     rgba(14, 7, 12, 0.85);
+      --hero-gradient-1: rgba(236, 72, 153, 0.12);
+      --hero-gradient-2: rgba(190, 24, 93, 0.08);
+      --card-glow:  rgba(236, 72, 153, 0.15);
+      --banner-bg:  linear-gradient(135deg, #2a1023 0%, #1a0c16 50%, #2a1023 100%);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-weight: 400;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    a { color: var(--pink-mid); text-decoration: none; }
+    a:hover { color: var(--pink-deep); }
+
+    /* ── Nav ─────────────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.5rem;
+      color: var(--pink-mid);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--pink-mid); }
+
+    .nav-invite {
+      background: var(--pink-mid);
+      color: #fff !important;
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.875rem !important;
+      font-weight: 600 !important;
+      transition: background 0.15s !important;
+    }
+
+    .nav-invite:hover { background: var(--pink-deep) !important; color: #fff !important; }
+
+    /* ── Dropdown Menu ───────────────────────────────────────────────────── */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-btn {
+      background: none;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s;
+      padding: 0;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .dropdown-btn:hover {
+      color: var(--pink-mid);
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      min-width: 140px;
+      box-shadow: 0px 8px 16px var(--card-glow);
+      z-index: 200;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .dropdown-content a {
+      color: var(--muted) !important;
+      padding: 0.6rem 1rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.85rem;
+      transition: background 0.15s, color 0.15s;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--blush) !important;
+      color: var(--pink-mid) !important;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    /* ── Theme Toggle Button ─────────────────────────────────────────────── */
+    .theme-toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      padding: 0.45rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: all 0.2s;
+      width: 36px;
+      height: 36px;
+    }
+
+    .theme-toggle-btn:hover {
+      color: var(--pink-mid);
+      border-color: var(--pink-light);
+      transform: scale(1.05);
+    }
+
+    .theme-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    .theme-toggle-btn:active svg {
+      transform: rotate(30deg);
+    }
+
+    /* Show/hide icon depending on theme */
+    html[data-theme="dark"] .sun-icon { display: block; }
+    html[data-theme="dark"] .moon-icon { display: none; }
+    html[data-theme="light"] .sun-icon { display: none; }
+    html[data-theme="light"] .moon-icon { display: block; }
+
+    /* ── Footer ──────────────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 5rem;
+      background: var(--blush);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    footer span { color: var(--pink-mid); }
+  </style>
+</head>
+<body>
+  <nav>
+    <span class="nav-logo">Lily</span>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/commands">Commands</a>
+      <div class="dropdown">
+        <button class="dropdown-btn" aria-haspopup="true">Info <span style="font-size: 0.6rem; margin-top: 2px;">▼</span></button>
+        <div class="dropdown-content">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+        </div>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+        <!-- Sun icon -->
+        <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9h-1m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        <!-- Moon icon -->
+        <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+      </button>
+      <a href="https://discord.com/oauth2/authorize?client_id=1516374380710727750&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" class="nav-invite">Add to Discord</a>
+    </div>
+  </nav>
+
+  <slot />
+
+  <footer>
+    <p>Made with <span>♥</span> · Lily &copy; {new Date().getFullYear()} · Built with discord.js</p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem; display: flex; justify-content: center; gap: 1.5rem;">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+    </p>
+  </footer>
+
+  <!-- Theme switching handler -->
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
